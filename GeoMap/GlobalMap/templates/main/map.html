@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>ГдеСеть?</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css" />
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+    <div id="auth-container">
+        <button class="login-top-btn" id="open-login-btn">Войти</button>
+
+        <div class="user-pill" id="user-pill-btn">
+            <div class="pill-avatar">
+                <span id="pill-initials">U</span>
+                <img id="pill-img" src="" alt="Avatar">
+            </div>
+            <span class="pill-name" id="pill-username">User</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+
+        <div id="profile-dropdown">
+            <div class="dropdown-item" id="drop-settings">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                Настройки
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item danger" id="drop-logout">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Выйти
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay">
+        <div class="settings-modal">
+            <div class="settings-sidebar">
+                <div class="sidebar-tab active" data-tab="tab-account">Учетная запись</div>
+                <div class="sidebar-tab" data-tab="tab-history">История действий</div>
+            </div>
+
+            <div class="settings-content">
+                <div class="modal-error" id="settings-error-msg"></div>
+
+                <div class="settings-pane active" id="tab-account">
+                    <div class="pane-title">Учетная запись</div>
+
+                    <div class="form-group">
+                        <span class="form-label">Аватар</span>
+                        <div class="avatar-upload-row">
+                            <div class="pill-avatar avatar-modal-box" id="modal-avatar-box" title="Изменить фото">
+                                <span id="modal-initials">U</span>
+                                <img id="modal-avatar-img" src="" alt="Avatar">
+                            </div>
+                            <input type="file" id="avatar-file-input" style="display: none;" accept="image/*">
+                            <span class="avatar-hint">Нажмите для загрузки аватарки </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <span class="form-label">Отображаемое имя</span>
+                        <input type="text" class="modal-input" id="profile-display-name" placeholder="Ваше имя">
+                    </div>
+
+                    <div class="form-group">
+                        <span class="form-label">Логин</span>
+                        <input type="text" class="modal-input" id="account-username">
+                    </div>
+
+                    <div class="form-group">
+                        <span class="form-label">Электронная почта</span>
+                        <input type="email" class="modal-input" id="account-email">
+                    </div>
+
+                    <div class="form-group">
+                        <span class="form-label">Мобильный оператор</span>
+                        <select class="modal-input" id="account-provider">
+                            <option value="">Не выбран</option>
+                            <option value="mts">МТС</option>
+                            <option value="Beeline">Билайн</option>
+                            <option value="megafon">Мегафон</option>
+                            <option value="tele2">Теле2</option>
+                            <option value="yota">Йота</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-sm">
+                        <button type="button" class="btn-main btn-secondary btn-full" id="open-change-password-modal-btn">Изменить пароль</button>
+                    </div>
+
+                    <div class="form-group">
+                        <span class="form-label">Тема оформления</span>
+                        <div class="theme-rect-grid">
+                            <div class="theme-rect" data-theme="light">
+                                <div class="theme-preview-light">Светлая</div>
+                            </div>
+                            <div class="theme-rect" data-theme="dark">
+                                <div class="theme-preview-dark">Темная</div>
+                            </div>
+                            <div class="theme-rect" data-theme="auto">
+                                <div class="theme-preview-auto"></div>
+                                <span class="theme-auto-badge">Авто</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-main" id="save-account-btn">Сохранить изменения</button>
+                </div>
+
+                <div class="settings-pane" id="tab-history">
+                    <div class="pane-title">История действий</div>
+                    <span class="history-hint">Лог ваших изменений на карте и взаимодействия с системой.</span>
+
+                    <div class="history-list" id="history-container">
+                        <div class="history-item">
+                            <span>Вход в систему выполнен успешно</span>
+                            <span class="history-time">Только что</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="change-password-modal" class="modal-overlay">
+        <div class="simple-modal-card">
+            <div class="modal-title">Изменение пароля</div>
+            <div class="modal-error" id="change-pass-error-msg"></div>
+
+            <div class="form-group">
+                <span class="form-label">Старый пароль</span>
+                <input type="password" class="modal-input" id="cp-old-password" placeholder="Введите старый пароль">
+            </div>
+            <div class="form-group">
+                <span class="form-label">Новый пароль</span>
+                <input type="password" class="modal-input" id="cp-new-password" placeholder="Введите новый пароль">
+            </div>
+            <div class="form-group">
+                <span class="form-label">Повторите новый пароль</span>
+                <input type="password" class="modal-input" id="cp-new-password-confirm" placeholder="Повторите новый пароль">
+            </div>
+
+            <div class="modal-actions-row">
+                <button class="btn-main" id="submit-change-password-btn">Сохранить</button>
+                <button class="btn-main btn-secondary" id="cancel-change-password-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="modal-overlay">
+        <div class="simple-modal-card">
+            <div class="modal-title" id="auth-modal-title">Вход в систему</div>
+            <div class="modal-error" id="auth-error-msg"></div>
+
+            <div class="form-group">
+                <span class="form-label">Логин</span>
+                <input type="text" class="modal-input" id="inp-username">
+            </div>
+            <div class="form-group" id="group-email">
+                <span class="form-label">Email</span>
+                <input type="email" class="modal-input" id="inp-email">
+            </div>
+            <div class="form-group">
+                <span class="form-label">Пароль</span>
+                <input type="password" class="modal-input" id="inp-password">
+            </div>
+            <div class="form-group" id="group-pass-confirm">
+                <span class="form-label">Повторите пароль</span>
+                <input type="password" class="modal-input" id="inp-password-confirm">
+            </div>
+
+            <button class="btn-main btn-full" id="auth-action-btn">Войти</button>
+            <div class="modal-link-text" id="auth-switch-text">Впервые на сайте? <span>Зарегистрируйтесь</span></div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div id="services-popup-menu">
+        <div class="menu-title">Доступные сервисы</div>
+        <div class="menu-subtitle" id="services-provider-subtitle">Оператор: Не выбран</div>
+        <div class="menu-divider"></div>
+        <div id="services-categories-container" class="services-container"></div>
+    </div>
+
+    <div id="custom-menu">
+        <div class="menu-title">Панель редактирования</div>
+        <button class="menu-btn" id="btn-marker">Создать заметку</button>
+        <button class="menu-btn" id="btn-polygon">Создать зону</button>
+        <button class="menu-btn" id="btn-edit">Редактировать границы</button>
+        <button class="menu-btn" id="btn-drag">Перенести области</button>
+        <button class="menu-btn" id="btn-rotate">Развернуть область</button>
+        <button class="menu-btn" id="btn-delete">Удалить зону</button>
+    </div>
+
+    <div id="marker-create-menu">
+        <div class="menu-title">Создать заметку</div>
+        <div class="menu-subtitle">Комментарий (до 500 символов)</div>
+        <textarea class="comment-input" id="marker-comment" maxlength="500" placeholder="Ваш комментарий..."></textarea>
+        <button class="btn-main btn-full-sm" id="btn-save-marker">Создать</button>
+    </div>
+
+    <div id="layer-menu">
+        <div class="menu-title">Параметры зоны</div>
+        <div class="menu-subtitle">Уровень сигнала</div>
+        <div class="color-picker">
+            <div class="color-option color-green" data-color="#10b981" title="Хорошая связь">✓</div>
+            <div class="color-option color-yellow" data-color="#f59e0b" title="Связь ограничена">!</div>
+            <div class="color-option color-red" data-color="#ef4444" title="Связь отсутствует либо почти не работает">✕</div>
+        </div>
+        <div class="menu-divider"></div>
+        <div class="menu-subtitle">Выбор оператора</div>
+        <div class="operators-scroll" id="operators-container"></div>
+        <div class="menu-divider"></div>
+        <div class="menu-subtitle" id="network-subtitle">Тип сети</div>
+        <div class="network-grid">
+            <div class="network-btn" data-tech="2G">2G</div>
+            <div class="network-btn" data-tech="3G">3G</div>
+            <div class="network-btn active" data-tech="4G">4G / LTE</div>
+            <div class="network-btn" data-tech="5G">5G</div>
+        </div>
+        <button class="default-btn" id="btn-default-net">Сбросить всех операторов на 4G</button>
+        <div class="menu-divider"></div>
+        <div class="menu-subtitle">Комментарий</div>
+        <textarea class="comment-input" id="layer-comment" placeholder="Заметка к зоне..."></textarea>
+        <button class="btn-main btn-full-sm" id="btn-save-layer">Сохранить зону</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
+    <script src="{% static 'script.js' %}"></script>
+
+</body>
+</html>а
